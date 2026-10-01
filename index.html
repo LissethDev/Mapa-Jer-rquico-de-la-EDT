@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Jerárquico - EDT FITLIFE</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: auto;
+        }
+
+        /* Encabezado */
+        .header {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .header h1 {
+            font-size: 38px;
+            color: #173b35;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #657184;
+            font-size: 16px;
+        }
+
+        /* Nodo principal */
+        .root {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 55px;
+            position: relative;
+        }
+
+        .root::after {
+            content: "";
+            position: absolute;
+            width: 3px;
+            height: 55px;
+            background: #8aa8a1;
+            top: 100%;
+        }
+
+        .root-box {
+            background: linear-gradient(135deg, #173b35, #28665a);
+            color: white;
+            padding: 20px 65px;
+            border-radius: 14px;
+            font-size: 27px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 25px rgba(23, 59, 53, .2);
+        }
+
+        /* Contenedor de las fases */
+        .phases {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            position: relative;
+        }
+
+        /* Línea horizontal superior */
+        .phases::before {
+            content: "";
+            position: absolute;
+            top: -28px;
+            left: 16.66%;
+            right: 16.66%;
+            height: 3px;
+            background: #8aa8a1;
+        }
+
+        /* Tarjeta */
+        .phase {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #dfe7e5;
+            box-shadow: 0 7px 20px rgba(30, 50, 60, .08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Línea que conecta cada tarjeta */
+        .phase::before {
+            content: "";
+            position: absolute;
+            width: 3px;
+            height: 28px;
+            background: #8aa8a1;
+            top: -28px;
+            left: 50%;
+        }
+
+        .phase-header {
+            background: #e6f2ef;
+            padding: 20px;
+            border-bottom: 1px solid #d3e4df;
+        }
+
+        .phase-number {
+            display: inline-block;
+            background: #28665a;
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 5px 9px;
+            border-radius: 20px;
+            margin-bottom: 9px;
+        }
+
+        .phase-header h2 {
+            font-size: 19px;
+            color: #173b35;
+            line-height: 1.3;
+        }
+
+        /* Lista */
+        .activities {
+            list-style: none;
+            padding: 18px 20px 22px;
+        }
+
+        .activities > li {
+            margin: 9px 0;
+            position: relative;
+        }
+
+        .activity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 8px;
+            background: #f8fafb;
+            border: 1px solid #edf0f2;
+            font-size: 14px;
+            transition: .2s ease;
+        }
+
+        .activity:hover {
+            background: #eef7f4;
+            border-color: #c9dfd9;
+            transform: translateX(3px);
+        }
+
+        .activity::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            min-width: 8px;
+            background: #3b8b79;
+            border-radius: 50%;
+        }
+
+        /* Subniveles */
+        .subactivities {
+            list-style: none;
+            margin: 7px 0 0 25px;
+            padding-left: 15px;
+            border-left: 2px solid #cbded9;
+        }
+
+        .subactivities li {
+            font-size: 13px;
+            color: #596573;
+            padding: 5px 0 5px 10px;
+            position: relative;
+        }
+
+        .subactivities li::before {
+            content: "";
+            position: absolute;
+            left: -17px;
+            top: 50%;
+            width: 12px;
+            height: 2px;
+            background: #cbded9;
+        }
+
+        /* Colores diferentes para las fases */
+        .phase:nth-child(1) .phase-number,
+        .phase:nth-child(1) .activity::before {
+            background: #3978a7;
+        }
+
+        .phase:nth-child(1) .phase-header {
+            background: #e9f2f9;
+        }
+
+        .phase:nth-child(2) .phase-number,
+        .phase:nth-child(2) .activity::before {
+            background: #8064a2;
+        }
+
+        .phase:nth-child(2) .phase-header {
+            background: #f1ecf7;
+        }
+
+        .phase:nth-child(3) .phase-number,
+        .phase:nth-child(3) .activity::before {
+            background: #d18445;
+        }
+
+        .phase:nth-child(3) .phase-header {
+            background: #fbf0e7;
+        }
+
+        .phase:nth-child(4) .phase-number,
+        .phase:nth-child(4) .activity::before {
+            background: #378a70;
+        }
+
+        .phase:nth-child(4) .phase-header {
+            background: #e8f5f0;
+        }
+
+        .phase:nth-child(5) .phase-number,
+        .phase:nth-child(5) .activity::before {
+            background: #c65b67;
+        }
+
+        .phase:nth-child(5) .phase-header {
+            background: #f9ebed;
+        }
+
+        .phase:nth-child(6) .phase-number,
+        .phase:nth-child(6) .activity::before {
+            background: #4e6ca5;
+        }
+
+        .phase:nth-child(6) .phase-header {
+            background: #eaf0fa;
+        }
+
+        /* Segunda fila */
+        .phase:nth-child(n+4) {
+            margin-top: 25px;
+        }
+
+        /* Pie */
+        .footer {
+            margin-top: 45px;
+            text-align: center;
+            color: #7b8794;
+            font-size: 13px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1100px) {
+            .phases {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .phases::before {
+                display: none;
+            }
+
+            .phase::before {
+                display: none;
+            }
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 25px 12px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .root-box {
+                font-size: 22px;
+                padding: 16px 40px;
+            }
+
+            .phases {
+                grid-template-columns: 1fr;
+            }
+
+            .phase:nth-child(n+4) {
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <h1>Mapa Jerárquico de la EDT</h1>
+            <p>Estructura de Desglose del Trabajo — Proyecto FITLIFE</p>
+        </header>
+
+        <!-- Proyecto principal -->
+        <div class="root">
+            <div class="root-box">
+                FITLIFE
+            </div>
+        </div>
+
+        <!-- Fases del proyecto -->
+        <main class="phases">
+
+            <!-- 1 -->
+            <section class="phase">
+                <div class="phase-header">
+                    <span class="phase-number">FASE 01</span>
+                    <h2>Inicio y planificación</h2>
+                </div>
+
+                <ul class="activities">
+                    <li>
+                        <div class="activity">Stakeholders</div>
+                    </li>
+
+                    <li>
+                        <div class="activity">Alcance</div>
+                    </li>
+
+                    <li>
+                        <div class="activity">Planificación</div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 2 -->
+            <section class="phase">
+                <div class="phase-header">
+                    <span class="phase-number">FASE 02</span>
+                    <h2>Diseño de la aplicación</h2>
+                </div>
+
+                <ul class="activities">
+                    <li>
+                        <div class="activity">Interfaz</div>
+                    </li>
+
+                    <li>
+                        <div class="activity">UX / UI</div>
+                    </li>
+
+                    <li>
+                        <div class="activity">Prototipo</div>
+                    </li>
+
+                    <li>
+                        <div class="activity">Revisión</div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 3 -->
+            <section class="phase">
+                <div class="phase-header">
+                    <span class="phase-number">FASE 03</span>
+                    <h2>Desarrollo de la aplicación</h2>
+                </div>
+
+                <ul class="activities">
+                    <li>
+                        <div class="activity">Registro</div>
+                    </li>
+
+                    <li>
+                        <div class="activity">Perfil</div>
+
+                        <ul class="subactivities">
+                            <li>Rutinas</li>
+                            <li>Recetas</li>
+                            <li>Foro</li>
+                            <li>Búsqueda</li>
+                            <li>Notificaciones</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 4 -->
+            <section class="phase">
+                <div class="phase-header">
+                    <span class="phase-number">FASE 04</span>
+                    <h2>Contenido</h2>
+                </div>
+
+                <ul class="activities">
+                    <li>
+                        <div class="activity">Rutinas</div>
+                    </li>
+
+                    <li>
+                        <div class="activity">Recetas</div>
+                    </li>
+
+                    <li>
+                        <div class="activity">Categorías</div>
+                    </li>
+
+                    <li>
+                        <div class="activity">Foro</div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 5 -->
+            <section class="phase">
+                <div class="phase-header">
+                    <span class="phase-number">FASE 05</span>
+                    <h2>Pruebas</h2>
+                </div>
+
+                <ul class="activities">
+                    <li>
+                        <div class="activity">Funciones</div>
+                    </li>
+
+                    <li>
+                        <div class="activity">Navegación</div>
+                    </li>
+
+                    <li>
+                        <div class="activity">Usuarios</div>
+                    </li>
+
+                    <li>
+                        <div class="activity">Errores</div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 6 -->
+            <section class="phase">
+                <div class="phase-header">
+                    <span class="phase-number">FASE 06</span>
+                    <h2>Implementación</h2>
+                </div>
+
+                <ul class="activities">
+                    <li>
+                        <div class="activity">Versión final</div>
+                    </li>
+
+                    <li>
+                        <div class="activity">Publicación</div>
+                    </li>
+
+                    <li>
+                        <div class="activity">Revisión</div>
+                    </li>
+
+                    <li>
+                        <div class="activity">Entrega</div>
+                    </li>
+                </ul>
+            </section>
+
+        </main>
+
+        <footer class="footer">
+            FITLIFE · Estructura de Desglose del Trabajo (EDT)
+        </footer>
+
+    </div>
+
+</body>
+</html>
